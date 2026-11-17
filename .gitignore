@@ -1,0 +1,34 @@
+# ---- 构建产物（可由 build_all.bat 重新生成，不进仓库）----
+build/venv/
+build/pyi-onefile/
+build/*.spec
+build/icon.ico
+build/build_onefile.log
+dist/
+dist-onefile/
+installer/staging/
+installer/build.sed
+installer/lhm_payload/
+installer/*.exe
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---- 本地工具 / 临时文件 ----
+tools/
+gh_rel.json
+*.log
+
+# ---- 系统 ----
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---- 注意 ----
+# deliverables/ 里的 exe 与 zip 是刻意提交的（见 README 的"要发给别人用"）。
+# 后续版本改用 GitHub Releases 挂附件，仓库里只留最新一份。
+# 历史版本归档不进货仓：
+deliverables/_old_v1.5/

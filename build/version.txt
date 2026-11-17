@@ -1,0 +1,30 @@
+# PyInstaller 版本资源。没有版本信息的裸 exe 更容易被启发式引擎判为可疑，
+# 而且用户在"属性 → 详细信息"里看到一片空白会起疑心。
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 6, 0, 0),
+    prodvers=(1, 6, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+        StringTable(
+          '080404B0',
+          [StringStruct('CompanyName', 'SysMon'),
+           StringStruct('FileDescription', '系统实时监测 · 网络与硬件看板'),
+           StringStruct('FileVersion', '1.6.0.0'),
+           StringStruct('InternalName', 'SysMon'),
+           StringStruct('LegalCopyright', '本机运行，不上传任何数据'),
+           StringStruct('OriginalFilename', '系统实时监测.exe'),
+           StringStruct('ProductName', '系统实时监测'),
+           StringStruct('ProductVersion', '1.6.0.0')])
+      ]),
+    VarFileInfo([VarStruct('Translation', [2052, 1200])])
+  ]
+)

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>系统实时监测</title>
+<link rel="stylesheet" href="style.css?v=7">
+<script>
+  /* 首屏前定主题，避免亮色用户看到一瞬黑屏 */
+  try {
+    if (localStorage.getItem('smon.theme') === 'light') {
+      document.documentElement.dataset.theme = 'light';
+    }
+  } catch (e) {}
+</script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="3" y="4" width="18" height="12" rx="1.5"/>
+        <path d="M8 20h8M12 16v4" stroke-linecap="round"/>
+        <path d="M6.5 12.5l2.5-3 2 4 2-5 2 4h2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1 data-i18n="app.title">系统实时监测</h1>
+      <p id="subline" data-i18n="app.subline.collecting">正在采集…</p>
+    </div>
+  </div>
+
+  <div class="score-wrap">
+    <div class="score-ring">
+      <svg viewBox="0 0 64 64">
+        <circle class="ring-bg" cx="32" cy="32" r="27"/>
+        <circle class="ring-fg" id="ring" cx="32" cy="32" r="27"/>
+      </svg>
+      <div class="score-num"><b id="score">--</b></div>
+    </div>
+    <div class="score-meta">
+      <div class="grade" id="grade" data-i18n="top.grade.evaluating">评估中</div>
+      <div class="tiny" data-i18n="top.health">健康评分</div>
+    </div>
+  </div>
+
+  <div class="theme-seg" id="theme-seg" data-i18n-title="top.theme.hint"
+       title="切换配色：副屏看不清时试试「亮」">
+    <button type="button" data-theme-set="dark" data-i18n="top.theme.dark">暗</button>
+    <button type="button" data-theme-set="light" data-i18n="top.theme.light">亮</button>
+  </div>
+
+  <div class="theme-seg" id="lang-seg" data-i18n-title="top.lang.hint"
+       title="切换界面语言（中 / EN）">
+    <button type="button" data-lang-set="zh">中</button>
+    <button type="button" data-lang-set="en">EN</button>
+  </div>
+
+  <div class="conn" id="conn-box">
+    <i class="dot" id="conn-dot"></i>
+    <span id="conn-text" data-i18n="conn.connecting">连接中</span>
+  </div>
+</header>
+
+<section class="kpis">
+  <div class="kpi k-cpu">
+    <div class="kpi-label" data-i18n="kpi.cpu">CPU</div>
+    <div class="kpi-val"><b id="k-cpu">0</b><i>%</i></div>
+    <div class="kpi-sub" id="k-cpu-sub">—</div>
+  </div>
+  <div class="kpi k-gpu">
+    <div class="kpi-label" data-i18n="kpi.gpu">显卡</div>
+    <div class="kpi-val"><b id="k-gpu">0</b><i>%</i></div>
+    <div class="kpi-sub" id="k-gpu-sub">—</div>
+  </div>
+  <div class="kpi k-mem">
+    <div class="kpi-label" data-i18n="kpi.mem">内存</div>
+    <div class="kpi-val"><b id="k-mem">0</b><i>%</i></div>
+    <div class="kpi-sub" id="k-mem-sub">—</div>
+  </div>
+  <div class="kpi k-diskio">
+    <div class="kpi-label" data-i18n="kpi.disk">磁盘 I/O</div>
+    <div class="kpi-val"><b id="k-disk">0</b><i>MB/s</i></div>
+    <div class="kpi-sub" id="k-disk-sub">—</div>
+  </div>
+  <div class="kpi k-down">
+    <div class="kpi-label" data-i18n="kpi.down">下行</div>
+    <div class="kpi-val"><b id="k-down">0.00</b><i>Mbps</i></div>
+    <div class="kpi-sub" id="k-down-sub">0 KB/s</div>
+  </div>
+  <div class="kpi k-rtt">
+    <div class="kpi-label" data-i18n="kpi.lat">延迟</div>
+    <div class="kpi-val"><b id="k-rtt">--</b><i>ms</i></div>
+    <div class="kpi-sub" id="k-rtt-sub">—</div>
+  </div>
+  <div class="kpi k-loss">
+    <div class="kpi-label" data-i18n="kpi.loss">丢包</div>
+    <div class="kpi-val"><b id="k-loss">--</b><i>%</i></div>
+    <div class="kpi-sub" id="k-loss-sub">—</div>
+  </div>
+</section>
+
+<main class="main">
+
+  <div class="sec">
+    <span class="sec-name" data-i18n="sec.system">系统资源</span>
+    <span class="sec-line"></span>
+    <span class="sec-en">SYSTEM</span>
+  </div>
+
+  <div class="grid g-sys">
+    <section class="card a-cpu">
+      <div class="card-head">
+        <h2 data-i18n="card.cpu">CPU</h2>
+        <span class="badge" id="cpu-badge">—</span>
+      </div>
+      <div class="big"><b id="hw-cpu">0</b><i>%</i></div>
+      <div class="bar"><div class="bar-fill cyan" id="bar-cpu"></div></div>
+      <div class="cores" id="cores"></div>
+      <div class="foot" id="hw-cpu-foot">—</div>
+    </section>
+
+    <section class="card a-gpu">
+      <div class="card-head">
+        <h2 data-i18n="card.gpu">显卡</h2>
+        <span class="badge" id="gpu-name">—</span>
+      </div>
+      <div id="gpu-body"><p class="muted" data-i18n="kpi.gpu.wait">采集中</p></div>
+    </section>
+
+    <section class="card a-mem">
+      <div class="card-head">
+        <h2 data-i18n="card.mem">内存</h2>
+        <span class="badge" id="mem-badge">—</span>
+      </div>
+      <div class="big"><b id="hw-mem">0</b><i>%</i></div>
+      <div class="bar"><div class="bar-fill violet" id="bar-mem"></div></div>
+      <div class="mem-stats" id="mem-stats"></div>
+      <div class="foot" id="hw-mem-foot">—</div>
+    </section>
+
+    <section class="card a-disk">
+      <div class="card-head">
+        <h2 data-i18n="card.disk">硬盘</h2>
+        <span class="badge" id="disk-io">—</span>
+      </div>
+      <div class="disks" id="disks"></div>
+      <div class="foot" id="disk-health"></div>
+    </section>
+
+    <section class="card a-temp">
+      <div class="card-head">
+        <h2 data-i18n="card.temp">温度</h2>
+        <span class="badge" id="temp-note">—</span>
+      </div>
+      <div class="temps" id="temps"></div>
+      <div class="foot" id="temp-foot"></div>
+    </section>
+
+    <section class="card a-proc">
+      <div class="card-head">
+        <h2 data-i18n="card.proc">进程监控</h2>
+        <span class="badge" id="rank-note">同名已合并 · Top 10</span>
+      </div>
+      <div class="rank-wrap">
+        <div class="rank-col">
+          <h3><span class="dotc cyan"></span><span data-i18n="rank.head.cpu">CPU 占用</span></h3>
+          <ol class="rank-list" id="rank-cpu"><li class="rk-empty">采样中…</li></ol>
+        </div>
+        <div class="rank-col">
+          <h3><span class="dotc violet"></span><span data-i18n="rank.head.mem">内存占用</span></h3>
+          <ol class="rank-list" id="rank-mem"><li class="rk-empty">采样中…</li></ol>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="sec sec-net">
+    <span class="sec-name" data-i18n="sec.network">网络状态</span>
+    <span class="sec-line"></span>
+    <span class="sec-en">NETWORK</span>
+  </div>
+
+  <div class="grid g-net">
+    <section class="card a-thru">
+      <div class="card-head">
+        <h2 data-i18n="card.thru">实时吞吐</h2>
+        <div class="head-right">
+          <span class="lg"><i style="background:#38bdf8"></i><span data-i18n="unit.down">下行</span></span>
+          <span class="lg"><i style="background:#c084fc"></i><span data-i18n="unit.up">上行</span></span>
+          <div class="seg" id="range-thru">
+            <button data-n="60" class="on" data-i18n="range.1m">1分</button>
+            <button data-n="300" data-i18n="range.5m">5分</button>
+            <button data-n="900" data-i18n="range.15m">15分</button>
+          </div>
+        </div>
+      </div>
+      <div class="canvas-box"><canvas id="c-thru"></canvas></div>
+    </section>
+
+    <section class="card a-lat">
+      <div class="card-head">
+        <h2 data-i18n="card.lat">延迟趋势</h2>
+        <div class="head-right">
+          <span class="lg"><i style="background:#34d399"></i><span data-i18n="unit.gw">网关</span></span>
+          <span class="lg"><i style="background:#fbbf24"></i><span data-i18n="unit.pub">公网</span></span>
+          <div class="seg" id="range-lat">
+            <button data-n="60" class="on" data-i18n="range.1m">1分</button>
+            <button data-n="300" data-i18n="range.5m">5分</button>
+            <button data-n="900" data-i18n="range.15m">15分</button>
+          </div>
+        </div>
+      </div>
+      <div class="canvas-box"><canvas id="c-lat"></canvas></div>
+    </section>
+
+    <section class="card a-link">
+      <div class="card-head">
+        <h2 data-i18n="card.link">链路</h2>
+        <span class="badge" id="link-badge">—</span>
+      </div>
+      <div class="chips" id="link"></div>
+    </section>
+  </div>
+
+  <section class="card a-advice collapsed" id="advice-card">
+    <button class="adv-toggle" id="adv-toggle" type="button">
+      <span class="adv-icon" id="adv-icon">◆</span>
+      <span class="adv-summary" id="adv-summary" data-i18n="adv.wait">等待分析…</span>
+      <span class="adv-count" id="adv-count"></span>
+      <span class="chev">⌄</span>
+    </button>
+    <div class="advice-list" id="advice"></div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span id="foot-nic">—</span>
+  <span class="sep">·</span>
+  <span data-i18n="foot.sample">1s 采样</span>
+  <span class="sep">·</span>
+  <span id="foot-uptime">运行 0s</span>
+  <span class="sep">·</span>
+  <span data-i18n="foot.privacy">仅本机 · 数据不上传</span>
+</footer>
+
+<script src="i18n.js?v=7"></script>
+<script src="app.js?v=7"></script>
+</body>
+</html>
