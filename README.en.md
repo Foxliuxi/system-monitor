@@ -19,8 +19,9 @@ analysis text, not just the menus. GPU support covers NVIDIA, AMD and Intel.
 
 ### Option A — just run it (recommended)
 
-1. Download `系统实时监测_v1.6_便携版.zip` from [Releases](../../releases)
-2. Unzip anywhere, double-click `系统实时监测.exe`
+1. Download `system-monitor-v1.6-portable.zip` from [Releases](../../releases)
+2. Unzip anywhere, double-click `系统实时监测.exe` (the binary keeps its Chinese name;
+   the interface inside is bilingual)
 3. A console window appears — **that is the program**, not an error. Your browser
    opens the dashboard automatically at `http://127.0.0.1:8770/`
 
@@ -42,7 +43,7 @@ python server.py --ping-target 1.1.1.1   # pick a closer probe target
 
 ### Option C — installer
 
-`系统实时监测_安装包_v1.6.exe` installs per-user to `%LOCALAPPDATA%\Programs`,
+`system-monitor-v1.6-setup.exe` installs per-user to `%LOCALAPPDATA%\Programs`,
 adds Start-menu shortcuts, registers a normal uninstaller, and asks once whether you
 want the optional temperature component.
 

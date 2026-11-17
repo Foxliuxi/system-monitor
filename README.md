@@ -343,7 +343,12 @@ netmon/
 
 ## 要发给别人用
 
-见 **`deliverables/打包与分发说明.md`**。一句话版本：
+**从 GitHub 下载**：https://github.com/Foxliuxi/system-monitor/releases/tag/v1.6
+附件是英文名（`system-monitor-v1.6-portable.zip` / `-setup.exe` / `-portable-exe.exe`）
+——GitHub 会把中文文件名转成下划线（`_._v1.6.exe`），所以发布时换成英文名。
+解压后程序本体仍是「系统实时监测.exe」。
+
+本地分发见 **`deliverables/打包与分发说明.md`**。一句话版本：
 
 发 `deliverables/系统实时监测_v1.6_便携版.zip`（13.8 MB，含温度组件），对方解压双击就能跑。
 遇到「Windows 已保护你的电脑」点「更多信息 → 仍要运行」（因为没有代码签名，不是病毒）。
